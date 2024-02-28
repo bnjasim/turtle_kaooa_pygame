@@ -301,10 +301,27 @@ class Kaooa(Turtle):
 				return
 
 			# check if vulture is jumping over a crow
-			# for new_vloc in self.jump[prev_vloc]:
+			for new_vloc in self.jump[prev_vloc]:
+				# the middle vertex should have a crow to jump-over
+				if nearest_vertext == new_vloc[1] and self.state[new_vloc[0]] == 'crow':
+					# move the vulture
+					self.state[prev_vloc] = ''
+					self.erase_dot(self.coords[prev_vloc])
+					self.state[nearest_vertext] = 'vulture'
+					self.color_dot_red(self.coords[nearest_vertext])
+					
+					# capture the crow
+					self.state[new_vloc[0]] = ''
+					self.erase_dot(self.coords[new_vloc[0]])
+					self.captured += 1
+					# re-render the text area
+					self.show_crow_status()
+					
 
 
-			# only nearby moves are allowed for the vulture
+
+
+			
 
 
 	def play_game(self):
