@@ -121,14 +121,44 @@ class Kaooa(Turtle):
 		# get the coordinates of the 10 vertices of the Star
 		self.coords = get_star_coordinates(400)
 
+		# the adjacency matrix of the vertices of the star
+		self.adj = [
+			[0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+			[0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
+			[0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+			[0, 0, 1, 0, 1, 0, 1, 0, 0, 1],
+			[1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+			[1, 0, 0, 1, 0, 0, 1, 0, 1, 0],
+			[0, 1, 0, 1, 0, 0, 0, 1, 0, 1],
+			[0, 1, 0, 0, 1, 1, 0, 0, 1, 0]
+		]
+
+		# the jump over positions (x,y) from index i -
+		# mean the vulture can jump from i to y through x.
+		self.jump = [
+			[(7,8), (6,5)],
+			[(8,7), (9,5)],
+			[(6,7), (5,9)],
+			[(7,6), (8,9)],
+			[(5,6), (9,8)],
+			[(9,1), (6,0)],
+			[(5,4), (7,3)],
+			[(6,2), (8,1)],
+			[(9,4), (7,0)],
+			[(8,3), (5,2)],
+		]
+
 		# choose a location randomly and place a crow there
 		loc = random.randint(0, 9)
 		self.state[loc] = 'crow'
 
 		# render the initial state
 		self.render_initial_state()
+		# set user turn
+		self.user_turn = True
 		self.play_game()
-
 
 	def color_dot_white(self, point):
 		# draw an white circles at coords of 'point'
@@ -165,7 +195,14 @@ class Kaooa(Turtle):
 		self.text_turtle.end_fill()
 
 	def erase_dot(self, point):
-		self.color_dot_white(self, point)
+		# first replace the dot with the background color
+		self.pen(pencolor=self.bgcolor, pensize=1, speed=self.speed_val)
+		self.penup()
+		self.goto(point)
+		self.pendown()
+		self.dot(24)
+		# place a white dot
+		self.color_dot_white(point)
 
 	def show_crow_status(self):
 		"""show the remaining crows number graphically"""
@@ -239,12 +276,35 @@ class Kaooa(Turtle):
 
 	def user_clicked(self, x, y):
 		# print("user clicked!")
+		if not self.user_turn: return
 		# find the nearest vertext to the click location
 		dists = [euclidean_distance((x,y), c) for c in self.coords]
+		nearest_vertext = dists.index(min(dists))
 		# the clicked position should be reasonably close to one of the vertices
-		if min(dists) < 20:
-			nearest_vertext = dists.index(min(dists))
-			self.color_dot_red(self.coords[nearest_vertext])
+		# and the clicked vertex should be empty
+		if min(dists) < 20 and self.state[nearest_vertext] == '':
+			# check if it's the first move of the user
+			if 'vulture' not in self.state:
+				self.state[nearest_vertext] = 'vulture'
+				self.color_dot_red(self.coords[nearest_vertext])
+				return
+			
+			prev_vloc = self.state.index('vulture')
+			# the clicked location has to be either nearby or a jump-over location
+			# check if clicking on a nearby location
+			if self.adj[prev_vloc][nearest_vertext]:
+				# move the vulture there
+				self.state[prev_vloc] = ''
+				self.erase_dot(self.coords[prev_vloc])
+				self.state[nearest_vertext] = 'vulture'
+				self.color_dot_red(self.coords[nearest_vertext])
+				return
+
+			# check if vulture is jumping over a crow
+			# for new_vloc in self.jump[prev_vloc]:
+
+
+			# only nearby moves are allowed for the vulture
 
 
 	def play_game(self):
