@@ -50,6 +50,9 @@ def find_intersection_point(p1, p2, p3, p4):
 
 
 def get_star_coordinates(side):
+	"""
+	Find the coordinates of all the 10 vertices of a star with center at (0,0)
+	"""
 	cos_18 = math.cos(math.radians(18))
 	tan_18 = math.tan(math.radians(18))
 	cos_36 = math.cos(math.radians(36))
@@ -76,6 +79,25 @@ def get_star_coordinates(side):
 	v9 = find_intersection_point(v1, v2, v3, v4)
 
 	return [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9]
+
+
+def euclidean_distance(p1, p2):
+    """
+    Calculate the Euclidean distance between two points in 2D space.
+
+    Parameters:
+    p1 (tuple): Coordinates of the first point (x1, y1).
+    p2 (tuple): Coordinates of the second point (x2, y2).
+
+    Returns:
+    float: The Euclidean distance between the two points.
+    """
+    x1, y1 = p1
+    x2, y2 = p2
+
+    distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+    return distance
+
 
 class Kaooa(Turtle):
 	def __init__(self):
@@ -105,6 +127,7 @@ class Kaooa(Turtle):
 
 		# render the initial state
 		self.render_initial_state()
+		self.play_game()
 
 
 	def color_dot_white(self, point):
@@ -182,8 +205,6 @@ class Kaooa(Turtle):
 			self.place_circle_text(pos)
 
 
-
-
 	def render_initial_state(self):
 		# re-render the state everytime
 		self.reset()
@@ -215,6 +236,26 @@ class Kaooa(Turtle):
 
 		
 		self.show_crow_status()
+
+	def user_clicked(self, x, y):
+		# print("user clicked!")
+		# find the nearest vertext to the click location
+		dists = [euclidean_distance((x,y), c) for c in self.coords]
+		# the clicked position should be reasonably close to one of the vertices
+		if min(dists) < 20:
+			nearest_vertext = dists.index(min(dists))
+			self.color_dot_red(self.coords[nearest_vertext])
+
+
+	def play_game(self):
+		"""
+		Play the kaooa game taking turns.
+		The user plays vulture & the system plays the crows.
+		"""
+		# wait for the user to click on an empty circle's vicinity
+		self.screen.onclick(self.user_clicked)
+		print("Game ended!")
+		
 
 
 game = Kaooa()
