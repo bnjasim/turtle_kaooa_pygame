@@ -49,7 +49,7 @@ def find_intersection_point(p1, p2, p3, p4):
 	return x_intersect, y_intersect
 
 
-def getStarCoordinates(side):
+def get_star_coordinates(side):
 	cos_18 = math.cos(math.radians(18))
 	tan_18 = math.tan(math.radians(18))
 	cos_36 = math.cos(math.radians(36))
@@ -82,10 +82,10 @@ class Kaooa(Turtle):
 		super().__init__()
 		self.thickness = 3
 		self.bgcolor = 'lightgreen'
+		self.speed_val = 8
 		# initial positions are all empty
 		self.state = ['', '', '', '', '', '', '', '', '', '']
 		self.ncrows = 0 # upto 7
-		self.begun = False
 		self.captured = 0
 		
 		# An empty screen is created automatically!
@@ -94,16 +94,43 @@ class Kaooa(Turtle):
 		self.screen.bgcolor(self.bgcolor)
 		
 		# get the coordinates of the 10 vertices of the Star
-		self.coords = getStarCoordinates(400)
+		self.coords = get_star_coordinates(400)
 
 		# choose a location randomly and place a crow there
 		loc = random.randint(0, 9)
 		self.state[loc] = 'crow'
-		
+
 		# render the initial state
 		self.renderState()
-		self.begun = True
 
+
+
+	def color_dot_white(self, point):
+		# draw an white circles at coords of 'point'
+		self.pen(pencolor="white", fillcolor="white", pensize=1, speed=self.speed_val)
+		self.penup()
+		self.goto(point)
+		self.pendown()
+		self.dot(18)
+
+	def color_dot_blue(self, point):
+		# blue color to represent a crow
+		self.pen(pencolor="blue", pensize=1, speed=self.speed_val)
+		self.penup()
+		self.goto(point)
+		self.pendown()
+		self.dot(24)
+
+	def color_dot_red(self, point):
+		# red color to represent a vulture
+		self.pen(pencolor="red", pensize=1, speed=self.speed_val)
+		self.penup()
+		self.goto(point)
+		self.pendown()
+		self.dot(24)
+
+	def erase_dot(self, point):
+		self.color_dot_white(self, point)
 
 
 	def renderState(self):
@@ -111,9 +138,7 @@ class Kaooa(Turtle):
 		self.reset()
 		
 		# Set the speed 1-10 (0 is instantaneous)
-		speed = 10
-		if self.begun: speed = 0
-		self.speed(speed)  
+		self.speed(self.speed_val)  
 		
 		self.hideturtle()  # Hide the turtle icon
 		# set thickness of the lines
@@ -130,23 +155,12 @@ class Kaooa(Turtle):
 		# set thickness of the lines to small
 		for i in range(10):
 			if self.state[i] == 'crow':
-				# blue color to represent the crow
-				self.pen(pencolor="blue", pensize=1, speed=speed)
-				self.penup()
-				self.goto(self.coords[i])
-				self.pendown()
-				self.dot(18)
+				self.color_dot_blue(self.coords[i])
 
 			elif self.state[i] == 'vulture':
-				pass
+				self.color_dot_red(self.coords[i])
 			else:
-				# draw an empty circles
-				self.pen(pencolor="white", fillcolor="white", pensize=1, speed=speed)
-				self.penup()
-				self.goto(self.coords[i])
-				self.pendown()
-				self.dot(18)
-
+				self.color_dot_white(self.coords[i])
 
 
 
