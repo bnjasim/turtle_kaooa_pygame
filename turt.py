@@ -133,7 +133,7 @@ class Kaooa(Turtle):
 
 	def place_circle_text(self, point):
 		"""paint a dot with blue color to represent a crow at the text area"""
-		self.text_turtle.pen(pencolor="blue", fillcolor="blue", pensize=1, speed=self.speed_val)
+		self.text_turtle.pen(fillcolor="blue", pensize=1, speed=self.speed_val)
 		self.text_turtle.penup()
 		self.text_turtle.goto(point)
 		self.text_turtle.pendown()
@@ -166,7 +166,22 @@ class Kaooa(Turtle):
 			pos = (pos[0]+30, pos[1])
 			self.place_circle_text(pos)
 
-		# reset 
+		# Show captured crows in the next line
+		pos = self.coords[2]
+		pos = (pos[0], pos[1]-100)
+		self.text_turtle.penup()
+		self.text_turtle.goto(pos)
+		self.text_turtle.pendown()
+		# Print the Text
+		self.text_turtle.write("Captured:", move=True, font=("Arial", 14, "normal"), align="left")
+		pos = (pos[0]+50, pos[1])
+		# show a blue circle for each crow
+		for i in range(self.captured):
+			# position slightly to the right
+			pos = (pos[0]+30, pos[1])
+			self.place_circle_text(pos)
+
+
 
 
 	def render_initial_state(self):
