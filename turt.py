@@ -82,16 +82,19 @@ class Kaooa(Turtle):
 		super().__init__()
 		self.thickness = 3
 		self.bgcolor = 'lightgreen'
-		self.speed_val = 8
+		# speed varies from 1-10 (slowest to fastest). 0 is instantaneous!!
+		self.speed_val = 0 
 		# initial positions are all empty
 		self.state = ['', '', '', '', '', '', '', '', '', '']
-		self.ncrows = 0 # upto 7
 		self.captured = 0
 		
 		# An empty screen is created automatically!
 		self.screen.title("Kaooa Game")
 		self.screen.setup(600, 600)
 		self.screen.bgcolor(self.bgcolor)
+
+		# declare an extra turtles to display text
+		self.text_turtle = Turtle()
 		
 		# get the coordinates of the 10 vertices of the Star
 		self.coords = get_star_coordinates(400)
@@ -101,8 +104,7 @@ class Kaooa(Turtle):
 		self.state[loc] = 'crow'
 
 		# render the initial state
-		self.renderState()
-
+		self.render_initial_state()
 
 
 	def color_dot_white(self, point):
@@ -129,11 +131,45 @@ class Kaooa(Turtle):
 		self.pendown()
 		self.dot(24)
 
+	def place_circle_text(self, point):
+		"""paint a dot with blue color to represent a crow at the text area"""
+		self.text_turtle.pen(pencolor="blue", fillcolor="blue", pensize=1, speed=self.speed_val)
+		self.text_turtle.penup()
+		self.text_turtle.goto(point)
+		self.text_turtle.pendown()
+		self.text_turtle.begin_fill()
+		self.text_turtle.circle(10)
+		self.text_turtle.end_fill()
+
 	def erase_dot(self, point):
 		self.color_dot_white(self, point)
 
+	def show_crow_status(self):
+		"""show the remaining crows number graphically"""
+		# reset the turtle 1
+		self.text_turtle.clear()
+		self.text_turtle.hideturtle()  # Hide the turtle icon
+		pos = self.coords[2]
+		# change y position
+		pos = (pos[0], pos[1]-50)
+		self.text_turtle.penup()
+		self.text_turtle.goto(pos)
+		self.text_turtle.pendown()
+		# Print the Text
+		self.text_turtle.write("Crows:", move=True, font=("Arial", 14, "normal"), align="left")
+		pos = (pos[0]+50, pos[1])
+		# show a blue circle for each crow
+		ncrows_placed = sum([x=='crow' for x in self.state]) + self.captured
+		ncrows_remaining = 7 - ncrows_placed
+		for i in range(ncrows_remaining):
+			# position slightly to the right
+			pos = (pos[0]+30, pos[1])
+			self.place_circle_text(pos)
 
-	def renderState(self):
+		# reset 
+
+
+	def render_initial_state(self):
 		# re-render the state everytime
 		self.reset()
 		
@@ -162,6 +198,8 @@ class Kaooa(Turtle):
 			else:
 				self.color_dot_white(self.coords[i])
 
+		
+		self.show_crow_status()
 
 
 game = Kaooa()
