@@ -184,11 +184,11 @@ class Kaooa(Turtle):
 	def lock_crow_dot(self):
 		point = self.coords[self.locked_vertex]
 		# violet color to represent a locked crow 
-		self.pen(pencolor="violet", pensize=1, speed=self.speed_val)
+		self.pen(pencolor="purple", pensize=1, speed=self.speed_val)
 		self.penup()
 		self.goto(point)
 		self.pendown()
-		self.dot(20)
+		self.dot(22)
 
 	def unlock_crow_dot(self):
 		point = self.coords[self.locked_vertex]
@@ -465,6 +465,8 @@ class Kaooa(Turtle):
 			# move only if the selected vertex is adjacent to the locked vertex
 			if self.adj[self.locked_vertex][selected_vertex]:
 				self.move_a_crow(self.locked_vertex, selected_vertex)
+				# remove any lock
+				self.locked_vertex = -1
 
 
 	def crows_turn(self, selected_vertex):
