@@ -400,6 +400,9 @@ class Kaooa(Turtle):
 		"""
 		check if the vulture is trapped by the crows
 		"""
+		# initial state; no trapping obviously!
+		if 'vulture' not in self.state: return False
+
 		# if all adjacent vertices are occupied by crows & no jumpover as well
 		vloc = self.state.index('vulture')
 		if not self.check_any_vmove_possible(vloc):
@@ -422,6 +425,7 @@ class Kaooa(Turtle):
 		self.show_crows_status()
 		# set vulture turn!
 		self.set_vturn(True)
+		self.check_vulture_trapped()
 
 	def lock_crow_vertex(self, selected_vertex):
 		# unlock any previously locked vertex
@@ -441,6 +445,7 @@ class Kaooa(Turtle):
 		self.color_dot_blue(self.coords[new_vertex])
 		# change turns
 		self.set_vturn(True)
+		self.check_vulture_trapped()
 
 	def move_an_existing_crow(self, selected_vertex):
 		"""
