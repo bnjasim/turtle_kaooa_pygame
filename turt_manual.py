@@ -236,14 +236,22 @@ class Kaooa(Turtle):
 		t.hideturtle()  # Hide the turtle icon
 		pos = self.coords[3]
 		# change y position
-		pos = (pos[0]+30, pos[1]+100)
+		pos = (pos[0]+250, pos[1]+60)
 		t.penup()
 		t.goto(pos)
 		t.pendown()
 		# Print the Text
 		text_to_display = "Turn: "
 		text_to_display += "vulture" if self.vturn else "crows"
-		t.write(text_to_display, move=False, font=("Arial", 11, "normal"), align="left")
+		t.write(text_to_display, move=False, font=("Arial", 11, "normal"), align="right")
+
+	def set_vturn(self, status):
+		"""
+		set vulture's turn to the input boolean value
+		"""
+		self.vturn = status
+		# re-render the turn info area
+		self.show_turn_info()
 
 	def show_crows_status(self):
 		"""show the remaining crows number graphically"""
@@ -324,9 +332,8 @@ class Kaooa(Turtle):
 		self.state[new_vertex] = 'vulture'
 		self.color_dot_red(self.coords[new_vertex])
 		# change turns
-		self.vturn = False
-		self.show_turn_info()
-
+		self.set_vturn(False)
+		
 	def check_any_vmove_possible(self, vloc):
 		"""
 		check if any move possible for the vulture at location vloc
@@ -350,9 +357,8 @@ class Kaooa(Turtle):
 		# re-render the crow status area
 		self.show_crows_status()
 		# set crows turn
-		self.vturn = False
-		self.show_turn_info()
-
+		self.set_vturn(False)
+		
 		if self.captured >= 4:
 			# Game Over!
 			time.sleep(1)
@@ -378,8 +384,7 @@ class Kaooa(Turtle):
 			self.state[selected_vertex] = 'vulture'
 			self.color_dot_red(self.coords[selected_vertex])
 			# change turns
-			self.vturn = False
-			self.show_turn_info()
+			self.set_vturn(False)
 			return
 		
 		prev_vertex = self.state.index('vulture')
@@ -416,8 +421,7 @@ class Kaooa(Turtle):
 		# re-render the crow status area
 		self.show_crows_status()
 		# set vulture turn!
-		self.vturn = True
-		self.show_turn_info()
+		self.set_vturn(True)
 
 	def lock_crow_vertex(self, selected_vertex):
 		# unlock any previously locked vertex
@@ -436,8 +440,7 @@ class Kaooa(Turtle):
 		self.state[new_vertex] = 'crow'
 		self.color_dot_blue(self.coords[new_vertex])
 		# change turns
-		self.vturn = True
-		self.show_turn_info()
+		self.set_vturn(True)
 
 	def move_an_existing_crow(self, selected_vertex):
 		"""
@@ -499,8 +502,7 @@ class Kaooa(Turtle):
 		The user plays vulture & the system plays the crows.
 		"""
 		# crows start the game
-		self.vturn = False
-		self.show_turn_info()
+		self.set_vturn(False)
 		# listener for user clicks on an empty circle's vicinity
 		self.screen.onclick(self.user_clicked)
 		# print("Game ended!")
