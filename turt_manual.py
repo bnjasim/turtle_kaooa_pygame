@@ -117,8 +117,9 @@ class Kaooa(Turtle):
 		self.screen.setup(600, 600)
 		self.screen.bgcolor(self.bgcolor)
 
-		# declare an extra turtles to display text
+		# declare extra turtles to display text
 		self.text_turtle = Turtle()
+		self.turn_turtle = Turtle()
 		
 		# get the coordinates of the 10 vertices of the Star
 		self.coords = get_star_coordinates(400)
@@ -154,8 +155,6 @@ class Kaooa(Turtle):
 
 		# render the initial state
 		self.render_state()
-		# set crows turn
-		self.vturn = False
 		self.play_game()
 
 	def color_dot_white(self, point):
@@ -228,20 +227,38 @@ class Kaooa(Turtle):
 		self.text_turtle.pendown()
 		# Print the Text
 		self.text_turtle.write(message, move=True, font=("Arial", 28, "normal"), align="center")
-		
+	
+	def show_turn_info(self):
+		"""show whose turn is next"""
+		t = self.turn_turtle
+		# reset the turtle to clear the text area
+		t.clear()
+		t.hideturtle()  # Hide the turtle icon
+		pos = self.coords[3]
+		# change y position
+		pos = (pos[0]+30, pos[1]+100)
+		t.penup()
+		t.goto(pos)
+		t.pendown()
+		# Print the Text
+		text_to_display = "Turn: "
+		text_to_display += "vulture" if self.vturn else "crows"
+		t.write(text_to_display, move=False, font=("Arial", 11, "normal"), align="left")
+
 	def show_crows_status(self):
 		"""show the remaining crows number graphically"""
+		t = self.text_turtle
 		# reset the turtle
-		self.text_turtle.clear()
-		self.text_turtle.hideturtle()  # Hide the turtle icon
+		t.clear()
+		t.hideturtle()  # Hide the turtle icon
 		pos = self.coords[2]
 		# change y position
 		pos = (pos[0], pos[1]-50)
-		self.text_turtle.penup()
-		self.text_turtle.goto(pos)
-		self.text_turtle.pendown()
+		t.penup()
+		t.goto(pos)
+		t.pendown()
 		# Print the Text
-		self.text_turtle.write("Crows:", move=True, font=("Arial", 14, "normal"), align="left")
+		t.write("Crows:", move=True, font=("Arial", 14, "normal"), align="left")
 		pos = (pos[0]+50, pos[1])
 		# show a blue circle for each crow
 		ncrows_placed = sum([x=='crow' for x in self.state]) + self.captured
@@ -254,11 +271,11 @@ class Kaooa(Turtle):
 		# Show captured crows in the next line
 		pos = self.coords[2]
 		pos = (pos[0], pos[1]-100)
-		self.text_turtle.penup()
-		self.text_turtle.goto(pos)
-		self.text_turtle.pendown()
+		t.penup()
+		t.goto(pos)
+		t.pendown()
 		# Print the Text
-		self.text_turtle.write("Captured:", move=True, font=("Arial", 14, "normal"), align="left")
+		t.write("Captured:", move=True, font=("Arial", 14, "normal"), align="left")
 		pos = (pos[0]+50, pos[1])
 		# show a blue circle for each crow
 		for i in range(self.captured):
@@ -308,6 +325,7 @@ class Kaooa(Turtle):
 		self.color_dot_red(self.coords[new_vertex])
 		# change turns
 		self.vturn = False
+		self.show_turn_info()
 
 	def check_any_vmove_possible(self, vloc):
 		"""
@@ -333,6 +351,7 @@ class Kaooa(Turtle):
 		self.show_crows_status()
 		# set crows turn
 		self.vturn = False
+		self.show_turn_info()
 
 		if self.captured >= 4:
 			# Game Over!
@@ -360,6 +379,7 @@ class Kaooa(Turtle):
 			self.color_dot_red(self.coords[selected_vertex])
 			# change turns
 			self.vturn = False
+			self.show_turn_info()
 			return
 		
 		prev_vertex = self.state.index('vulture')
@@ -397,6 +417,7 @@ class Kaooa(Turtle):
 		self.show_crows_status()
 		# set vulture turn!
 		self.vturn = True
+		self.show_turn_info()
 
 	def lock_crow_vertex(self, selected_vertex):
 		# unlock any previously locked vertex
@@ -416,6 +437,7 @@ class Kaooa(Turtle):
 		self.color_dot_blue(self.coords[new_vertex])
 		# change turns
 		self.vturn = True
+		self.show_turn_info()
 
 	def move_an_existing_crow(self, selected_vertex):
 		"""
@@ -476,7 +498,10 @@ class Kaooa(Turtle):
 		Play the kaooa game taking turns.
 		The user plays vulture & the system plays the crows.
 		"""
-		# wait for the user to click on an empty circle's vicinity
+		# crows start the game
+		self.vturn = False
+		self.show_turn_info()
+		# listener for user clicks on an empty circle's vicinity
 		self.screen.onclick(self.user_clicked)
 		# print("Game ended!")
 		
