@@ -108,7 +108,7 @@ class Kaooa(Turtle):
 		self.speed_val = 0 
 		# initial positions are all empty
 		self.state = ['', '', '', '', '', '', '', '', '', '']
-		self.captured = 0
+		self.captured = 3
 		
 		# An empty screen is created automatically!
 		self.screen.title("Kaooa Game")
@@ -204,9 +204,24 @@ class Kaooa(Turtle):
 		# place a white dot
 		self.color_dot_white(point)
 
+	def show_gameover_status(self, message=""):
+		"""show a text message in the texta area"""
+		# reset the turtle
+		self.text_turtle.clear()
+		self.text_turtle.hideturtle()  # Hide the turtle icon
+		pos = self.coords[2]
+		# change y position
+		pos = (pos[0]+180, pos[1]-70)
+		self.text_turtle.penup()
+		self.text_turtle.goto(pos)
+		self.text_turtle.pendown()
+		# Print the Text
+		self.text_turtle.write(message, move=True, font=("Arial", 28, "normal"), align="center")
+		
+
 	def show_crow_status(self):
 		"""show the remaining crows number graphically"""
-		# reset the turtle 1
+		# reset the turtle
 		self.text_turtle.clear()
 		self.text_turtle.hideturtle()  # Hide the turtle icon
 		pos = self.coords[2]
@@ -282,40 +297,60 @@ class Kaooa(Turtle):
 		nearest_vertext = dists.index(min(dists))
 		# the clicked position should be reasonably close to one of the vertices
 		# and the clicked vertex should be empty
-		if min(dists) < 20 and self.state[nearest_vertext] == '':
-			# check if it's the first move of the user
-			if 'vulture' not in self.state:
-				self.state[nearest_vertext] = 'vulture'
-				self.color_dot_red(self.coords[nearest_vertext])
-				return
-			
-			prev_vloc = self.state.index('vulture')
-			# the clicked location has to be either nearby or a jump-over location
-			# check if clicking on a nearby location
-			if self.adj[prev_vloc][nearest_vertext]:
-				# move the vulture there
-				self.state[prev_vloc] = ''
-				self.erase_dot(self.coords[prev_vloc])
-				self.state[nearest_vertext] = 'vulture'
-				self.color_dot_red(self.coords[nearest_vertext])
+		if min(dists) > 20 or self.state[nearest_vertext] != '': return
+		
+		# check if it's the first move of the user
+		if 'vulture' not in self.state:
+			self.state[nearest_vertext] = 'vulture'
+			self.color_dot_red(self.coords[nearest_vertext])
+			return
+		
+		prev_vloc = self.state.index('vulture')
+		# the clicked location has to be either nearby or a jump-over location
+		# check if clicking on a nearby location
+		if self.adj[prev_vloc][nearest_vertext]:
+			# move the vulture there
+			self.state[prev_vloc] = ''
+			self.erase_dot(self.coords[prev_vloc])
+			self.state[nearest_vertext] = 'vulture'
+			self.color_dot_red(self.coords[nearest_vertext])
+			return
+
+		# check if vulture is jumping over a crow
+		for new_vloc in self.jump[prev_vloc]:
+			# the middle vertex should have a crow to jump-over
+			if nearest_vertext != new_vloc[1] or self.state[new_vloc[0]] != 'crow':
+				continue
+
+			# else jump the vulture
+			self.state[prev_vloc] = ''
+			self.erase_dot(self.coords[prev_vloc])
+			self.state[nearest_vertext] = 'vulture'
+			self.color_dot_red(self.coords[nearest_vertext])
+
+			# capture the crow
+			self.state[new_vloc[0]] = ''
+			self.erase_dot(self.coords[new_vloc[0]])
+			self.captured += 1
+			# re-render the text area
+			self.show_crow_status()
+
+			# set system turn
+			self.user_turn = False
+
+			if self.captured >= 4:
+				# Game Over!
+				time.sleep(1)
+				self.show_gameover_status("You Won!")
+				time.sleep(3)
+				# Exit the game!
+				self.screen.bye()
 				return
 
-			# check if vulture is jumping over a crow
-			for new_vloc in self.jump[prev_vloc]:
-				# the middle vertex should have a crow to jump-over
-				if nearest_vertext == new_vloc[1] and self.state[new_vloc[0]] == 'crow':
-					# move the vulture
-					self.state[prev_vloc] = ''
-					self.erase_dot(self.coords[prev_vloc])
-					self.state[nearest_vertext] = 'vulture'
-					self.color_dot_red(self.coords[nearest_vertext])
-					
-					# capture the crow
-					self.state[new_vloc[0]] = ''
-					self.erase_dot(self.coords[new_vloc[0]])
-					self.captured += 1
-					# re-render the text area
-					self.show_crow_status()
+			# let system make a move
+
+			
+
 					
 
 
