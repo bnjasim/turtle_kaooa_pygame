@@ -108,7 +108,7 @@ class Kaooa(Turtle):
 		self.speed_val = 0 
 		# initial positions are all empty
 		self.state = ['', '', '', '', '', '', '', '', '', '']
-		self.captured = 3
+		self.captured = 0
 		
 		# An empty screen is created automatically!
 		self.screen.title("Kaooa Game")
@@ -319,6 +319,23 @@ class Kaooa(Turtle):
 				self.color_dot_blue(self.coords[adj_loc])
 				return
 
+	def check_any_move_possible(self, vloc):
+		"""
+		check if any move possible for the vulture at location vloc
+		"""
+		# check if any nearby move possible
+		for loc, val in enumerate(self.adj[vloc]):
+			if val and self.state[loc] == '':
+				return True
+
+		# check for any jump-over locations possible
+		for middle, target in self.jump[vloc]:
+			if self.state[target] == '':
+				return True
+
+		return False
+
+
 	def system_move(self):
 		# let the system make a move; two possibilities (place/move)
 		self.user_turn = False
@@ -332,7 +349,14 @@ class Kaooa(Turtle):
 		# check if the vulture is trapped!
 		# if all adjacent vertices are occupied & if no jumpover as well
 		vloc = self.state.index('vulture')
-		# if all([self.adj[vloc]])
+		if not self.check_any_move_possible(vloc):
+			# Game Over!
+			time.sleep(1)
+			self.show_gameover_status("You Lost!")
+			# time.sleep(4)
+			# Exit the game!
+			# self.screen.bye()
+			return
 
 		# set user turn!
 		self.user_turn = True
@@ -394,9 +418,9 @@ class Kaooa(Turtle):
 				# Game Over!
 				time.sleep(1)
 				self.show_gameover_status("You Won!")
-				time.sleep(10)
+				# time.sleep(4)
 				# Exit the game!
-				self.screen.bye()
+				# self.screen.bye()
 				return
 			
 			# else let the system make a move
