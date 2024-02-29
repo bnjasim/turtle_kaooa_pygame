@@ -218,7 +218,6 @@ class Kaooa(Turtle):
 		# Print the Text
 		self.text_turtle.write(message, move=True, font=("Arial", 28, "normal"), align="center")
 		
-
 	def show_crow_status(self):
 		"""show the remaining crows number graphically"""
 		# reset the turtle
@@ -286,8 +285,57 @@ class Kaooa(Turtle):
 			else:
 				self.color_dot_white(self.coords[i])
 
-		
 		self.show_crow_status()
+
+	def place_crow(self):
+		"""
+		place a crow randomly in an empty location
+		"""
+		empty_locs = [i for i in range(len(self.state)) if self.state[i] == '']
+		new_cloc = random.choice(empty_locs)
+		# place the crow there
+		self.state[new_cloc] = 'crow'
+		self.color_dot_blue(self.coords[new_cloc])
+		# re-render the crow status area
+		self.show_crow_status()
+
+	def move_crow(self):
+		"""
+		move a crow from a random location to a nearby empty location
+		"""
+		crow_locs = [i for i in range(len(self.state)) if self.state[i] == 'crow']
+		# shuffle the crow locations for randomness
+		random.shuffle(crow_locs)
+
+		for cloc in crow_locs:
+			# check if there is an empty nearby location to move to			
+			for adj_loc, val in enumerate(self.adj[cloc]):
+				if val == 0: continue
+				if self.state[adj_loc] != '': continue
+				# otherwise move the crow there
+				self.state[cloc] = ''
+				self.erase_dot(self.coords[cloc])
+				self.state[adj_loc] = 'crow'
+				self.color_dot_blue(self.coords[adj_loc])
+				return
+
+	def system_move(self):
+		# let the system make a move; two possibilities (place/move)
+		self.user_turn = False
+		# count how many crows are already placed on the board
+		ncrows_placed = sum([x=='crow' for x in self.state]) + self.captured
+		if ncrows_placed < 7:
+			self.place_crow()
+		else:
+			self.move_crow()
+
+		# check if the vulture is trapped!
+		# if all adjacent vertices are occupied & if no jumpover as well
+		vloc = self.state.index('vulture')
+		# if all([self.adj[vloc]])
+
+		# set user turn!
+		self.user_turn = True
 
 	def user_clicked(self, x, y):
 		# print("user clicked!")
@@ -303,6 +351,8 @@ class Kaooa(Turtle):
 		if 'vulture' not in self.state:
 			self.state[nearest_vertext] = 'vulture'
 			self.color_dot_red(self.coords[nearest_vertext])
+			# let the system make a move
+			self.system_move()
 			return
 		
 		prev_vloc = self.state.index('vulture')
@@ -314,6 +364,8 @@ class Kaooa(Turtle):
 			self.erase_dot(self.coords[prev_vloc])
 			self.state[nearest_vertext] = 'vulture'
 			self.color_dot_red(self.coords[nearest_vertext])
+			# let the system make a move
+			self.system_move()
 			return
 
 		# check if vulture is jumping over a crow
@@ -342,21 +394,13 @@ class Kaooa(Turtle):
 				# Game Over!
 				time.sleep(1)
 				self.show_gameover_status("You Won!")
-				time.sleep(3)
+				time.sleep(10)
 				# Exit the game!
 				self.screen.bye()
 				return
-
-			# let system make a move
-
 			
-
-					
-
-
-
-
-			
+			# else let the system make a move
+			self.system_move()
 
 
 	def play_game(self):
