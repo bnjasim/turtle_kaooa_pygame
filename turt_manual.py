@@ -30,7 +30,7 @@ def find_intersection_point(p1, p2, p3, p4):
 	# Check for parallel lines
 	if m1 == m2:
 		# Lines are parallel, no intersection
-	    raise ValueError("Parallel lines has no point of intersection")  
+	    raise ValueError("Parallel lines has no point of intersection")
 
 	# Calculate y-intercepts
 	b1 = y1 - m1 * x1
@@ -271,7 +271,7 @@ class Kaooa(Turtle):
 		# show a blue circle for each crow
 		ncrows_placed = sum([x=='crow' for x in self.state]) + self.captured
 		ncrows_remaining = 7 - ncrows_placed
-		for i in range(ncrows_remaining):
+		for _ in range(ncrows_remaining):
 			# position slightly to the right
 			pos = (pos[0]+30, pos[1])
 			self.place_circle_text(pos)

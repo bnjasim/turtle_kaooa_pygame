@@ -359,11 +359,12 @@ class Kaooa(Turtle):
         move the vulture from prev_vertex to the new_vertex
         """
         self.state[prev_vertex] = ''
+        # change turns
+        self._set_vturn(False)
         self._erase_dot(self.coords[prev_vertex])
         self.state[new_vertex] = 'vulture'
         self._color_dot_red(self.coords[new_vertex])
-        # change turns
-        self._set_vturn(False)
+
 
     def _check_any_vmove_possible(self, vloc):
         """
@@ -386,12 +387,12 @@ class Kaooa(Turtle):
         A function which changes the graphics & state when a crow is captured.
         """
         self.state[crow_vertex] = ''
+        # set crows turn
+        self._set_vturn(False)
         self._erase_dot(self.coords[crow_vertex])
         self.captured += 1
         # re-render the crow status area
         self._show_crows_status()
-        # set crows turn
-        self._set_vturn(False)
 
         if self.captured >= 4:
             # Game Over!
@@ -423,9 +424,9 @@ class Kaooa(Turtle):
         # check if it's the first move of the user
         if 'vulture' not in self.state:
             self.state[selected_vertex] = 'vulture'
-            self._color_dot_red(self.coords[selected_vertex])
             # change turns
             self._set_vturn(False)
+            self._color_dot_red(self.coords[selected_vertex])
             return
 
         prev_vertex = self.state.index('vulture')
@@ -462,11 +463,11 @@ class Kaooa(Turtle):
         """
         # place the crow on the selected vertex
         self.state[selected_vertex] = 'crow'
+        # set vulture turn!
+        self._set_vturn(True)
         self._color_dot_blue(self.coords[selected_vertex])
         # re-render the crow status area
         self._show_crows_status()
-        # set vulture turn!
-        self._set_vturn(True)
         self._check_vulture_trapped()
 
     def _lock_crow_vertex(self, selected_vertex):
@@ -485,11 +486,11 @@ class Kaooa(Turtle):
         move a crow from the prev_vertex to the new_vertex
         """
         self.state[prev_vertex] = ''
+        # change turns
+        self._set_vturn(True)
         self._erase_dot(self.coords[prev_vertex])
         self.state[new_vertex] = 'crow'
         self._color_dot_blue(self.coords[new_vertex])
-        # change turns
-        self._set_vturn(True)
         self._check_vulture_trapped()
 
     def _move_an_existing_crow(self, selected_vertex):
